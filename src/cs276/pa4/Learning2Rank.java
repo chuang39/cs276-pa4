@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -133,7 +134,8 @@ public class Learning2Rank {
 	    /* performance on the training data */
 	    Map<String, List<String>> trained_ranked_queries = test(train_data_file, model, task, idfs);
 	    String trainOutFile="tmp.train.ranked";
-	    writeRankedResultsToFile(trained_ranked_queries, new PrintStream(new FileOutputStream(trainOutFile)));
+	    OutputStream trainOutputStream = new FileOutputStream(trainOutFile);
+	    writeRankedResultsToFile(trained_ranked_queries, new PrintStream(trainOutputStream));
 	    NdcgMain ndcg = new NdcgMain(train_rel_file);
 	    System.err.println("# Trained NDCG=" + ndcg.score(trainOutFile));
 	    (new File(trainOutFile)).delete();
