@@ -37,7 +37,7 @@ public class PointwiseLearner extends Learner {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return lr;
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class PointwiseLearner extends Learner {
 	@Override
 	public Map<String, List<String>> testing(TestFeatures tf, Classifier model) {
 		Map<String, List<String>> results = new HashMap<String, List<String>>();
-		
+
 		for (String query : tf.index_map.keySet()) {
 			Map<String, Integer> candidates = tf.index_map.get(query);
 			List<String> rankings = rankDocuments(query, candidates, model, tf.features);
@@ -166,7 +166,7 @@ public class PointwiseLearner extends Learner {
 		normalizeTFs(tfs, doc, q);
 
 		Map<String, Double> tfQuery = getQueryFreqs(q, idfs);
-		
+
         double[] instance = new double[6];
         
         instance[0] = dotProduct(tfQuery, tfs.get("url"));
@@ -197,18 +197,26 @@ public class PointwiseLearner extends Learner {
 	// Handle the query vector to get query frequency
 	public static Map<String, Double> getQueryFreqs(Query q, Map<String, Double> idfs) {
 		Map<String, Double> tfQuery = new HashMap<String, Double>(); // queryWord -> term frequency
+		Map<String, Integer> counts = new HashMap<String, Integer>();
 
 		List<String> queryWords = q.words;
 
 		for (String queryWord : queryWords) {
-			if (tfQuery.containsKey(queryWord)) {
+			if (counts.containsKey(queryWord)) {
 				// Increment the term doc count
-				tfQuery.put(queryWord, tfQuery.get(queryWord) + 1);
+				counts.put(queryWord, counts.get(queryWord) + 1);
 			} else {
-				tfQuery.put(queryWord, 1.0);
+				counts.put(queryWord, 1);
 			}
 		}
 
+        for (String term : counts.keySet()) {
+            if (idfs.containsKey(term)) {
+                tfQuery.put(term, 1.0 * counts.get(term) * idfs.get(term));
+            } else {
+                tfQuery.put(term, Math.log(98998+1));
+            }
+        }
 		return tfQuery;
 	}
 	

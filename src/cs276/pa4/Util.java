@@ -94,7 +94,12 @@ public class Util {
       dfs.put(tokens[0], Double.parseDouble(tokens[1]));
     }
     br.close();
-    return dfs;
+
+    Map<String,Double> idfs = new HashMap<String, Double>();
+    for (Map.Entry<String, Double> entry : dfs.entrySet()) {
+		idfs.put(entry.getKey(), Math.log((double)(98998+1)/(entry.getValue() + 1)));
+    }
+    return idfs;
   }
 
   /* query -> (url -> score) */
