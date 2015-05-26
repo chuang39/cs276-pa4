@@ -28,10 +28,13 @@ public class Learning2Rank {
 		  boolean isLinearKernel = true;
 			learner = new PairwiseLearner(isLinearKernel);
 		} else if (task == 3) {
+		
+			// Learner for task 3
+//			learner = new PointwiseLearnerExtra();
 			
-			/* 
-			 * @TODO: Your code here, add more features 
-			 * */
+			boolean isLinearKernel = true;
+			learner = new PairwiseLearnerExtra(isLinearKernel);
+			
 			System.err.println("Task 3");
 			
 		} else if (task == 4) {
@@ -63,9 +66,12 @@ public class Learning2Rank {
 				learner = new PairwiseLearner(isLinearKernel);
 			} else if (task == 3) {
 
-				/* 
-				 * @TODO: Your code here, add more features 
-				 * */
+				// Learner for task 3
+//				learner = new PointwiseLearnerExtra();
+				
+				boolean isLinearKernel = true;
+				learner = new PairwiseLearnerExtra(isLinearKernel);
+				
 				System.err.println("Task 3");
 				
 			} else if (task == 4) {

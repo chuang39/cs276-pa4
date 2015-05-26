@@ -17,6 +17,9 @@ import weka.core.Instances;
 
 public abstract class Learner {
 	
+	// Smoothing factor for log transformation to pageranks
+	private static final double LAMBDA = 3.0;
+	
 	/* Construct training features matrix */
 	public abstract Instances extract_train_features(String train_data_file, String train_rel_file, Map<String,Double> idfs);
 
@@ -73,41 +76,62 @@ public abstract class Learner {
 		return testFeatures;
 	}
 
-	int extractDocumentFeatures(Instances features, Query q, List<Document> docs, Map<String, Double> idfs, Map<String, Map<String, Double>> rels,
-								Map<String, Map<String, Integer>> indexMap, int index) {
+	int extractDocumentFeatures(Instances features, Query q, List<Document> docs,
+			Map<String, Double> idfs, Map<String, Map<String, Double>> rels,
+			Map<String, Map<String, Integer>> indexMap, int index) {
 		Map<String, Integer> indices = new HashMap<>();
-	    String query = q.toString();
+		String query = q.toString();
 
-	    for (Document doc : docs) {
-	    	String url = doc.url;
-            double relScore = rels == null ? 0.0 : rels.get(query).get(url);
-            Instance inst = new DenseInstance(1.0, extractTfIdfFeatures(q, doc, relScore, idfs));
-            features.add(inst);
-	        indices.put(url, index++);
-	    }
+		for (Document doc : docs) {
+			String url = doc.url;
+			double relScore = rels == null ? 0.0 : rels.get(query).get(url);
 
-        indexMap.put(query, indices);
+			List<Double> featureVector = extractTfIdfFeatures(q, doc, idfs);
 
-        return index;
+			// Form final feature vector by adding relevance score
+			featureVector.add(relScore);
+
+			// Copy list into an array of doubles
+			double[] featureVecArr = new double[featureVector.size()];
+
+			for (int i = 0; i < featureVector.size(); i++) {
+				featureVecArr[i] = featureVector.get(i);
+			}
+
+			Instance inst = new DenseInstance(1.0, featureVecArr);
+			features.add(inst);
+			indices.put(url, index++);
+		}
+
+		indexMap.put(query, indices);
+
+		return index;
 	}
 	
-	static double[] extractTfIdfFeatures(Query q, Document doc, double score, Map<String, Double> idfs) {
+	/**
+	 * Returns a list of the tfidf cosine similarity features for each field
+	 * 
+	 * @param q
+	 * @param doc
+	 * @param idfs
+	 * @return
+	 */
+	static List<Double> extractTfIdfFeatures(Query q, Document doc, Map<String, Double> idfs) {
 		// TODO: we should use BM25 to calculate tf!
 		Map<String, Map<String, Double>> tfs = getDocTermFreqs(doc, q);
 		normalizeTFs(tfs, doc, q);
 
 		Map<String, Double> tfQuery = getQueryFreqs(q, idfs);
-
-        double[] instance = new double[6];
+		
+		List<Double> tfidfFeatures = new ArrayList<Double>();
         
-        instance[0] = dotProduct(tfQuery, tfs.get("url"));
-        instance[1] = dotProduct(tfQuery, tfs.get("title"));
-        instance[2] = dotProduct(tfQuery, tfs.get("body"));
-        instance[3] = dotProduct(tfQuery, tfs.get("header"));
-        instance[4] = dotProduct(tfQuery, tfs.get("anchor"));
-        instance[5] = score;
+    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("url")));
+    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("title")));
+    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("body")));
+    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("header")));
+    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("anchor")));
 
-        return instance;
+    return tfidfFeatures;
 	}
 	
 	static double dotProduct(Map<String, Double> tsv, Map<String, Double> qv) {
@@ -302,5 +326,146 @@ public abstract class Learner {
 
 		}
 		return tfs;
+	}
+	
+	// Added new versions of existing methods to handle all features.
+	
+
+	/**
+	 * Extracts all the features from the data file and returns them. This includes tfidf cosine
+	 * similarity features as well as any additional features.
+	 * 
+	 * @param datasetName
+	 * @param dataFile
+	 * @param relFile
+	 * @param idfs
+	 * @return
+	 */
+	TestFeatures extractAllFeatures(String datasetName, String dataFile, String relFile, Map<String, Double> idfs) {
+		
+		Instances features = null;
+		
+		/* Build attributes list */
+		ArrayList<Attribute> attributes = new ArrayList<Attribute>();
+		attributes.add(new Attribute("url_w"));
+		attributes.add(new Attribute("title_w"));
+		attributes.add(new Attribute("body_w"));
+		attributes.add(new Attribute("header_w"));
+		attributes.add(new Attribute("anchor_w"));
+		
+		// New features
+		attributes.add(new Attribute("bm25_score"));
+		attributes.add(new Attribute("pagerank"));
+		
+		/*
+		 * TODO add additional features here
+		 * 
+		 * Note: The attributes here must match up with the Instances data set returned from this function
+		 */
+		
+		attributes.add(new Attribute("relevance_score"));
+		features = new Instances(datasetName, attributes, 0);
+		
+		Map<Query, List<Document>> data = null;
+		Map<String, Map<String, Double>> rels = null;
+		try {
+			data = loadTrainData(dataFile);
+			if (relFile != null)
+				rels = loadRelData(relFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		Map<String, Map<String, Integer>> indexMap = new HashMap<String, Map<String, Integer>>();
+		int index = 0;
+		for (Query q : data.keySet()) {
+			List<Document> docs = data.get(q);
+
+			index = extractAllDocumentFeatures(features, q, docs, idfs, rels, indexMap, index);
+		}
+		
+		/* Set last attribute as target */
+		features.setClassIndex(features.numAttributes() - 1);
+		
+		TestFeatures testFeatures = new TestFeatures();
+		testFeatures.features = features;
+		testFeatures.index_map = indexMap;		
+		
+		return testFeatures;
+	}
+	
+	/**
+	 * Extracts all the document features and adds them to features
+	 * 
+	 * 
+	 * @param features Instances that the features will be added to
+	 * @param q	The query
+	 * @param docs List of documents feature vectors will be built for
+	 * @param idfs Idfs
+	 * @param rels 
+	 * @param indexMap Index map to be updated
+	 * @param index Starting index
+	 * @return
+	 */
+	int extractAllDocumentFeatures(Instances features, Query q, List<Document> docs,
+			Map<String, Double> idfs, Map<String, Map<String, Double>> rels,
+			Map<String, Map<String, Integer>> indexMap, int index) {
+		Map<String, Integer> indices = new HashMap<>();
+		String query = q.toString();
+
+		for (Document doc : docs) {
+			String url = doc.url;
+			double relScore = rels == null ? 0.0 : rels.get(query).get(url);
+			
+			// Extract tfidf features
+			List<Double> featureVector = extractTfIdfFeatures(q, doc, idfs);
+			
+			// Extract additional features
+			featureVector.addAll(extractAdditionalFeatures(q, doc, docs, idfs));
+
+			// Form final feature vector by adding relevance score
+			featureVector.add(relScore);
+
+			// Copy list into an array of doubles
+			double[] featureVecArr = new double[featureVector.size()];
+
+			for (int i = 0; i < featureVector.size(); i++) {
+				featureVecArr[i] = featureVector.get(i);
+			}
+
+			Instance inst = new DenseInstance(1.0, featureVecArr);
+			features.add(inst);
+			indices.put(url, index++);
+		}
+
+		indexMap.put(query, indices);
+
+		return index;
+	}
+	
+	/**
+	 * Returns a list of doubles corresponding to the additional features
+	 * 
+	 * @param q
+	 * @param doc
+	 * @return
+	 */
+	List<Double> extractAdditionalFeatures(Query q, Document doc,
+			List<Document> docs, Map<String, Double> idfs) {
+
+		List<Double> features = new ArrayList<Double>();
+		
+		BM25Scorer bm25Scorer = new BM25Scorer(idfs, docs);
+		features.add(bm25Scorer.getSimScore(doc, q));
+
+		// Pageranks must be smoothed because some documents dont have one
+		features.add(Math.log(doc.page_rank + LAMBDA));
+
+		/*
+		 * TODO add additional features here
+		 */
+
+		return features;
+
 	}
 }

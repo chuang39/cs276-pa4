@@ -19,12 +19,12 @@ import static cs276.pa4.Util.loadTrainData;
 import static cs276.pa4.Util.loadRelData;
 import static cs276.utils.MapUtils.convertToPairs;
 
-public class PointwiseLearner extends Learner {
+public class PointwiseLearnerExtra extends Learner {
 
 	@Override
 	public Instances extract_train_features(String train_data_file,
 			String train_rel_file, Map<String, Double> idfs) {
-		TestFeatures testFeatures = extractFeatures("train_dataset", train_data_file, train_rel_file, idfs);
+		TestFeatures testFeatures = extractAllFeatures("train_dataset", train_data_file, train_rel_file, idfs);
         return testFeatures.features;
 	}
 
@@ -43,7 +43,7 @@ public class PointwiseLearner extends Learner {
 	@Override
 	public TestFeatures extract_test_features(String test_data_file,
 			Map<String, Double> idfs) {
-		return extractFeatures("test_dataset", test_data_file, null, idfs);
+		return extractAllFeatures("test_dataset", test_data_file, null, idfs);
 	}
 
 	@Override
