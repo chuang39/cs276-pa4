@@ -21,7 +21,7 @@ public abstract class AScorer {
 	}
 
 	// Score each document for each query.
-	public abstract double getSimScore(Document d, Query q);
+	public abstract List<Double> getSimScore(Document d, Query q);
 
 	// Handle the query vector
 	public Map<String, Double> getQueryFreqs(Query q) {

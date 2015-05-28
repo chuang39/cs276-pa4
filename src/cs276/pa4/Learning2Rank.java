@@ -67,7 +67,7 @@ public class Learning2Rank {
 			} else if (task == 3) {
 
 				// Learner for task 3
-//				learner = new PointwiseLearnerExtra();
+				//learner = new PointwiseLearnerExtra();
 				
 				boolean isLinearKernel = true;
 				learner = new PairwiseLearnerExtra(isLinearKernel);

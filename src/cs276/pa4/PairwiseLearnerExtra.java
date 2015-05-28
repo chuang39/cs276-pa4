@@ -139,6 +139,13 @@ public class PairwiseLearnerExtra extends Learner {
 		/*
 		 * TODO Add new features here
 		 */
+		///*
+		attributes.add(new Attribute("url_window"));
+		attributes.add(new Attribute("title_window"));
+		attributes.add(new Attribute("body_window"));
+		attributes.add(new Attribute("header_window"));
+		attributes.add(new Attribute("anchor_window"));
+		//*/
 		
 		// Create attributes of class labels
 		ArrayList<String> classLabels = new ArrayList<>();

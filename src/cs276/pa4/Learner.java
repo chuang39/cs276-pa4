@@ -125,13 +125,13 @@ public abstract class Learner {
 		
 		List<Double> tfidfFeatures = new ArrayList<Double>();
         
-    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("url")));
-    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("title")));
-    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("body")));
-    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("header")));
-    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("anchor")));
+	    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("url")));
+	    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("title")));
+	    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("body")));
+	    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("header")));
+	    tfidfFeatures.add(dotProduct(tfQuery, tfs.get("anchor")));
 
-    return tfidfFeatures;
+	    return tfidfFeatures;
 	}
 	
 	static double dotProduct(Map<String, Double> tsv, Map<String, Double> qv) {
@@ -329,7 +329,7 @@ public abstract class Learner {
 	}
 	
 	// Added new versions of existing methods to handle all features.
-	
+
 
 	/**
 	 * Extracts all the features from the data file and returns them. This includes tfidf cosine
@@ -356,6 +356,14 @@ public abstract class Learner {
 		// New features
 		attributes.add(new Attribute("bm25_score"));
 		attributes.add(new Attribute("pagerank"));
+
+		///*
+		attributes.add(new Attribute("url_window"));
+		attributes.add(new Attribute("title_window"));
+		attributes.add(new Attribute("body_window"));
+		attributes.add(new Attribute("header_window"));
+		attributes.add(new Attribute("anchor_window"));
+		//*/
 		
 		/*
 		 * TODO add additional features here
@@ -456,7 +464,7 @@ public abstract class Learner {
 		List<Double> features = new ArrayList<Double>();
 		
 		BM25Scorer bm25Scorer = new BM25Scorer(idfs, docs);
-		features.add(bm25Scorer.getSimScore(doc, q));
+		features.addAll(bm25Scorer.getSimScore(doc, q));
 
 		// Pageranks must be smoothed because some documents dont have one
 		features.add(Math.log(doc.page_rank + LAMBDA));
@@ -464,6 +472,8 @@ public abstract class Learner {
 		/*
 		 * TODO add additional features here
 		 */
+		SmallestWindowScorer swScorer = new SmallestWindowScorer(idfs);
+		features.addAll(swScorer.getSimScore(doc, q));
 
 		return features;
 

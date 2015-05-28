@@ -1,6 +1,7 @@
 package cs276.pa4;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -223,7 +224,7 @@ public class BM25Scorer extends AScorer {
 
 
 	@Override
-	public double getSimScore(Document d, Query q) {
+	public List<Double> getSimScore(Document d, Query q) {
 		
 		Map<String,Map<String, Double>> tfs = this.getDocTermFreqs(d,q);
 		
@@ -231,7 +232,9 @@ public class BM25Scorer extends AScorer {
 		
 		Map<String,Double> tfQuery = getQueryFreqs(q);
 
-	    return getNetScore(tfs,q,tfQuery,d);
+		double score = getNetScore(tfs,q,tfQuery,d);
+		ArrayList<Double> res = new ArrayList<Double>(Arrays.asList(score));
+	    return res;
 	}
 	
 	/**
