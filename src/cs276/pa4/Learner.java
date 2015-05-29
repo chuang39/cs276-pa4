@@ -364,6 +364,8 @@ public abstract class Learner {
 		attributes.add(new Attribute("header_window"));
 		attributes.add(new Attribute("anchor_window"));
 		//*/
+		attributes.add(new Attribute("pdf"));
+
 		
 		/*
 		 * TODO add additional features here
@@ -474,6 +476,9 @@ public abstract class Learner {
 		 */
 		SmallestWindowScorer swScorer = new SmallestWindowScorer(idfs);
 		features.addAll(swScorer.getSimScore(doc, q));
+
+		pdfDetectionScorer pdfScorer = new pdfDetectionScorer();
+		features.addAll(pdfScorer.getSimScore(doc));
 
 		return features;
 
