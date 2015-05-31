@@ -255,7 +255,7 @@ def output(partId, ch_aux):
     # dev
     dev_file = 'data/pa4.signal.dev'
     print '# Running on development test data ...'
-    dev_output_length = 1066
+    dev_output_length = 1482
     (dev_results, dev_elapsed) = run_task(str(partId), dev_file, dev_output_length)
 
     # test
@@ -264,7 +264,7 @@ def output(partId, ch_aux):
     test_file.write(ch_aux)
     test_file.close()
     test_file = test_file.name
-    test_output_length = 1065
+    test_output_length = 1482
     (results, elapsed) = run_task(str(partId), test_file, test_output_length)
   else:
     print '[WARNING]\t[output]\tunknown partId: %s' % partId
