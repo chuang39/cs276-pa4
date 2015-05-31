@@ -357,14 +357,14 @@ public abstract class Learner {
 		attributes.add(new Attribute("bm25_score"));
 		attributes.add(new Attribute("pagerank"));
 
-		///*
+		/*
 		attributes.add(new Attribute("url_window"));
 		attributes.add(new Attribute("title_window"));
 		attributes.add(new Attribute("body_window"));
 		attributes.add(new Attribute("header_window"));
 		attributes.add(new Attribute("anchor_window"));
-		//*/
-		attributes.add(new Attribute("pdf"));
+		*/
+		//attributes.add(new Attribute("pdf"));
 
 		
 		/*
@@ -474,11 +474,11 @@ public abstract class Learner {
 		/*
 		 * TODO add additional features here
 		 */
-		SmallestWindowScorer swScorer = new SmallestWindowScorer(idfs);
-		features.addAll(swScorer.getSimScore(doc, q));
+		//SmallestWindowScorer swScorer = new SmallestWindowScorer(idfs);
+		//features.addAll(swScorer.getSimScore(doc, q));
 
-		pdfDetectionScorer pdfScorer = new pdfDetectionScorer();
-		features.addAll(pdfScorer.getSimScore(doc));
+		//pdfDetectionScorer pdfScorer = new pdfDetectionScorer();
+		//features.addAll(pdfScorer.getSimScore(doc));
 
 		return features;
 

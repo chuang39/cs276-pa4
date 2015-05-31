@@ -25,23 +25,12 @@ public class PointwiseLearnerExtra extends Learner {
 	@Override
 	public Instances extract_train_features(String train_data_file,
 			String train_rel_file, Map<String, Double> idfs) {
-		TestFeatures testFeatures = extractFeatures("train_dataset", train_data_file, train_rel_file, idfs);
+		TestFeatures testFeatures = extractAllFeatures("train_dataset", train_data_file, train_rel_file, idfs);
         return testFeatures.features;
 	}
 
 	@Override
 	public Classifier training(Instances dataset) {
-		///*
-		Classifier lr = new LinearRegression();
-		try {
-			lr.buildClassifier(dataset);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return lr;
-		//*/
-		/*
 		LibSVM svm = new LibSVM();
         svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_NU_SVR, LibSVM.TAGS_SVMTYPE));
        // svm.setCost(50);
@@ -55,13 +44,12 @@ public class PointwiseLearnerExtra extends Learner {
         }
 
         return svm;
-       */
 	}
 
 	@Override
 	public TestFeatures extract_test_features(String test_data_file,
 			Map<String, Double> idfs) {
-		return extractFeatures("test_dataset", test_data_file, null, idfs);
+		return extractAllFeatures("test_dataset", test_data_file, null, idfs);
 	}
 
 	@Override

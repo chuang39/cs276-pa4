@@ -32,7 +32,6 @@ public class PairwiseLearnerExtra extends Learner {
     } catch (Exception e){
       e.printStackTrace();
     }
-    
     if(isLinearKernel){
       model.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_LINEAR, LibSVM.TAGS_KERNELTYPE));
     }
@@ -139,14 +138,14 @@ public class PairwiseLearnerExtra extends Learner {
 		/*
 		 * TODO Add new features here
 		 */
-		///*
+		/*
 		attributes.add(new Attribute("url_window"));
 		attributes.add(new Attribute("title_window"));
 		attributes.add(new Attribute("body_window"));
 		attributes.add(new Attribute("header_window"));
 		attributes.add(new Attribute("anchor_window"));
-		//*/
-		attributes.add(new Attribute("pdf"));
+		*/
+		//attributes.add(new Attribute("pdf"));
 
 
 		// Create attributes of class labels
