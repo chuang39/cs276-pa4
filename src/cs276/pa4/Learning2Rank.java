@@ -28,22 +28,15 @@ public class Learning2Rank {
 		  boolean isLinearKernel = true;
 			learner = new PairwiseLearner(isLinearKernel);
 		} else if (task == 3) {
-		
-			// Learner for task 3
-//			learner = new PointwiseLearnerExtra();
-			
 			boolean isLinearKernel = true;
 			learner = new PairwiseLearnerExtra(isLinearKernel);
 			
 			System.err.println("Task 3");
-			
 		} else if (task == 4) {
+			// Learner for task 4
+			learner = new PointwiseLearnerExtra();
 			
-			/* 
-			 * @TODO: Your code here, extra credit 
-			 * */
 			System.err.println("Extra credit");
-			
 		}
  		
 		/* Step (1): construct your feature matrix here */
@@ -65,22 +58,17 @@ public class Learning2Rank {
 			  boolean isLinearKernel = true;
 				learner = new PairwiseLearner(isLinearKernel);
 			} else if (task == 3) {
-
-				// Learner for task 3
-				//learner = new PointwiseLearnerExtra();
-				
+			
 				boolean isLinearKernel = true;
 				learner = new PairwiseLearnerExtra(isLinearKernel);
 				
 				System.err.println("Task 3");
 				
 			} else if (task == 4) {
-				
-				/* 
-				 * @TODO: Your code here, extra credit 
-				 * */
+				// Learner for task 3
+				learner = new PointwiseLearnerExtra();
+
 				System.err.println("Extra credit");
-				
 			}
 		 
 	 		/* Step (1): construct your test feature matrix here */
