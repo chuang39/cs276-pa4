@@ -15,7 +15,9 @@ import weka.classifiers.Classifier;
 import weka.core.Instances;
 
 public class Learning2Rank {
-
+	
+	private static final double C = 0.25;
+	private static final double LAMBDA = 0.25;
 	
 	public static Classifier train(String train_data_file, String train_rel_file, int task, Map<String,Double> idfs) {
 	    System.err.println("## Training with feature_file =" + train_data_file + ", rel_file = " + train_rel_file + " ... \n");
@@ -25,7 +27,8 @@ public class Learning2Rank {
  		if (task == 1) {
 			learner = new PointwiseLearner();
 		} else if (task == 2) {
-		  boolean isLinearKernel = true;
+		  boolean isLinearKernel = false;
+//			learner = new PairwiseLearner(C, LAMBDA, isLinearKernel);
 			learner = new PairwiseLearner(isLinearKernel);
 		} else if (task == 3) {
 			boolean isLinearKernel = true;
